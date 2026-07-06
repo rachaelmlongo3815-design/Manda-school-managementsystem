@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manda Primary School — Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E4;
+    --paper-line:#DAD0B4;
+    --ink:#26311F;
+    --ink-soft:#5B6350;
+    --folder:#2F4B3C;
+    --folder-dark:#22392D;
+    --folder-tab:#3E6350;
+    --red:#A63D2F;
+    --gold:#C08A1E;
+    --card-shadow: 0 2px 6px rgba(34,57,45,0.15);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--folder-dark);
+    color:var(--ink);
+  }
+  h1,h2,h3,h4{
+    font-family:'Zilla Slab',serif;
+    margin:0 0 .4em 0;
+    color:var(--ink);
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  button{font-family:'Inter',sans-serif;cursor:pointer;}
+  input,select{font-family:'Inter',sans-serif;}
+  ::selection{background:var(--gold);color:#fff;}
+
+  /* ---------- LOGIN SCREEN ---------- */
+  #loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03), transparent 40%),
+      var(--folder-dark);
+  }
+  .login-card{
+    background:var(--paper);
+    width:340px;
+    padding:2.2em 2em 2em;
+    border-radius:2px 2px 10px 10px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.35);
+    position:relative;
+  }
+  .login-card::before{
+    content:"";
+    position:absolute;
+    top:-14px; left:24px;
+    width:120px; height:14px;
+    background:var(--folder-tab);
+    border-radius:6px 6px 0 0;
+  }
+  .login-card h1{font-size:1.4em;letter-spacing:.3px;}
+  .login-card p.sub{color:var(--ink-soft);font-size:.85em;margin-top:-.3em;margin-bottom:1.4em;}
+  .field{margin-bottom:1em;}
+  .field label{display:block;font-size:.75em;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:.35em;}
+  .field input, .field select{
+    width:100%;
+    padding:.6em .7em;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    border-radius:4px;
+    font-size:.95em;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus, button:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:1px;
+  }
+  .btn{
+    border:none;
+    background:var(--folder);
+    color:#fff;
+    padding:.65em 1em;
+    border-radius:4px;
+    font-size:.9em;
+    font-weight:500;
+    letter-spacing:.02em;
+  }
+  .btn:hover{background:var(--folder-tab);}
+  .btn.wide{width:100%;}
+  .btn.red{background:var(--red);}
+  .btn.red:hover{background:#8c3226;}
+  .btn.small{padding:.35em .7em;font-size:.8em;}
+  .error-msg{
+    background:#F7E2DE;
+    color:var(--red);
+    border:1px solid #E4B9B0;
+    padding:.6em .8em;
+    border-radius:4px;
+    font-size:.85em;
+    margin-bottom:1em;
+  }
+  .hint{font-size:.75em;color:var(--ink-soft);margin-top:1em;text-align:center;}
+
+  /* ---------- APP LAYOUT ---------- */
+  #app{display:none;min-height:100vh;}
+  .shell{display:flex;min-height:100vh;}
+
+  /* Sidebar styled as a stack of folder tabs */
+  .sidebar{
+    width:210px;
+    flex-shrink:0;
+    background:var(--folder-dark);
+    padding:1.4em 0 1em;
+    display:flex;
+    flex-direction:column;
+  }
+  .brand{
+    color:#EFE9D6;
+    padding:0 1.1em 1.2em;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    margin-bottom:.6em;
+  }
+  .brand .badge{
+    font-family:'Zilla Slab',serif;
+    font-size:1.15em;
+    font-weight:700;
+    line-height:1.15;
+  }
+  .brand .role{
+    font-size:.72em;
+    color:#B7C4B4;
+    margin-top:.3em;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  nav.tabs{flex:1;display:flex;flex-direction:column;gap:2px;padding:.6em 0;}
+  nav.tabs button{
+    text-align:left;
+    background:var(--folder);
+    color:#DDE6DA;
+    border:none;
+    padding:.65em 1.1em;
+    font-size:.88em;
+    letter-spacing:.02em;
+    position:relative;
+    margin-right:14px;
+    border-radius:0 6px 6px 0;
+    transition:margin-right .15s ease, background .15s ease;
+  }
+  nav.tabs button:hover{background:var(--folder-tab);}
+  nav.tabs button.active{
+    background:var(--paper);
+    color:var(--ink);
+    margin-right:0;
+    font-weight:600;
+    box-shadow:2px 0 0 var(--gold) inset;
+  }
+  .sidebar .logout{
+    margin:1em 1.1em 0;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.25);
+    color:#EFE9D6;
+    padding:.5em .8em;
+    border-radius:4px;
+    font-size:.8em;
+  }
+  .sidebar .logout:hover{background:rgba(255,255,255,0.08);}
+
+  /* Main content = ledger paper */
+  .content{
+    flex:1;
+    background:var(--paper);
+    padding:2em 2.4em 3em;
+    overflow-y:auto;
+  }
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-head{margin-bottom:1.4em;}
+  .page-head .eyebrow{
+    font-size:.72em;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+  }
+
+  /* Dashboard stat cards */
+  .stats{display:flex;gap:1em;flex-wrap:wrap;margin-top:1em;}
+  .stat-card{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-left:4px solid var(--folder);
+    border-radius:4px;
+    padding:1em 1.2em;
+    min-width:150px;
+    box-shadow:var(--card-shadow);
+  }
+  .stat-card .num{font-family:'Zilla Slab',serif;font-size:1.8em;font-weight:700;}
+  .stat-card .label{font-size:.78em;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+  .stat-card.gold{border-left-color:var(--gold);}
+  .stat-card.red{border-left-color:var(--red);}
+
+  /* Form cards */
+  .card{
+    background:#fff;
+    border:1px solid var(--paper-line);
+    border-radius:6px;
+    padding:1.2em 1.3em;
+    margin-bottom:1.6em;
+    box-shadow:var(--card-shadow);
+  }
+  .card h3{font-size:1.05em;margin-bottom:.8em;}
+  .form-row{display:flex;flex-wrap:wrap;gap:.7em;align-items:flex-end;}
+  .form-row .field{flex:1 1 160px;margin-bottom:0;}
+  .form-row .field.small{flex:0 0 100px;}
+  .form-row .submit-col{flex:0 0 auto;}
+
+  /* Ledger tables */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    box-shadow:var(--card-shadow);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  thead th{
+    background:var(--folder);
+    color:#EFE9D6;
+    text-align:left;
+    padding:.6em .8em;
+    font-size:.72em;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    font-weight:600;
+  }
+  tbody td{
+    padding:.6em .8em;
+    border-bottom:1px solid var(--paper-line);
+    font-size:.9em;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:nth-child(even){background:#FBF8F0;}
+  .empty-row td{
+    text-align:center;
+    color:var(--ink-soft);
+    font-style:italic;
+    padding:1.2em;
+  }
+  .balance-pos{color:var(--red);font-weight:600;}
+  .balance-zero{color:#3B7A3F;font-weight:600;}
+
+  @media (max-width: 780px){
+    .shell{flex-direction:column;}
+    .sidebar{width:100%;}
+    nav.tabs{flex-direction:row;flex-wrap:wrap;padding:.4em .6em;}
+    nav.tabs button{margin-right:0;border-radius:4px;}
+    nav.tabs button.active{box-shadow:none;border-bottom:3px solid var(--gold);}
+    .content{padding:1.4em;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>Manda Primary School</h1>
+    <p class="sub">Student &amp; Records Register</p>
+    <div id="loginError" class="error-msg" style="display:none;"></div>
+    <form id="loginForm">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="loginUser" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPass" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn wide">Log In</button>
+    </form>
+    <p class="hint">Demo login — username <b>admin</b>, password <b>admin123</b></p>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="badge">Manda Primary<br>School</div>
+        <div class="role">Records Register</div>
+      </div>
+      <nav class="tabs">
+        <button data-page="dashboard" class="active">Dashboard</button>
+        <button data-page="students">Students</button>
+        <button data-page="teachers">Teachers</button>
+        <button data-page="classes">Classes</button>
+        <button data-page="subjects">Subjects</button>
+        <button data-page="attendance">Attendance</button>
+        <button data-page="results">Results</button>
+        <button data-page="fees">Fees</button>
+      </nav>
+      <button class="logout" id="logoutBtn">Log out</button>
+    </aside>
+
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <section id="page-dashboard" class="page active">
+        <div class="page-head">
+          <div class="eyebrow">Overview</div>
+          <h2>Dashboard</h2>
+        </div>
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="statStudents">0</div><div class="label">Students</div></div>
+          <div class="stat-card gold"><div class="num" id="statTeachers">0</div><div class="label">Teachers</div></div>
+          <div class="stat-card"><div class="num" id="statClasses">0</div><div class="label">Classes</div></div>
+          <div class="stat-card red"><div class="num" id="statFees">0</div><div class="label">Total Fees Billed</div></div>
+        </div>
+      </section>
+
+      <!-- STUDENTS -->
+      <section id="page-students" class="page">
+        <div class="page-head"><div class="eyebrow">Records</div><h2>Students</h2></div>
+        <div class="card">
+          <h3>Add New Student</h3>
+          <form id="studentForm">
+            <div class="form-row">
+              <div class="field"><label>Admission No</label><input type="text" id="s_admission" required></div>
+              <div class="field"><label>First Name</label><input type="text" id="s_first" required></div>
+              <div class="field"><label>Last Name</label><input type="text" id="s_last" required></div>
+              <div class="field small"><label>Gender</label>
+                <select id="s_gender" required><option value="">--</option><option>Male</option><option>Female</option></select>
+              </div>
+              <div class="field small"><label>DOB</label><input type="date" id="s_dob"></div>
+              <div class="field"><label>Class</label><select id="s_class"></select></div>
+            </div>
+            <div class="form-row" style="margin-top:.7em;">
+              <div class="field"><label>Parent Name</label><input type="text" id="s_parent"></div>
+              <div class="field"><label>Parent Phone</label><input type="text" id="s_phone"></div>
+              <div class="field"><label>Address</label><input type="text" id="s_address"></div>
+              <div class="submit-col"><button type="submit" class="btn">Add Student</button></div>
+            </div>
+          </form>
+        </div>
+        <table>
+          <thead><tr><th>Admission No</th><th>Name</th><th>Gender</th><th>Class</th><th>Parent</th><th>Phone</th><th>Action</th></tr></thead>
+          <tbody id="studentsTable"></tbody>
+        </table>
+      </section>
+
+      <!-- TEACHERS -->
+      <section id="page-teachers" class="page">
+        <div class="page-head"><div class="eyebrow">Records</div><h2>Teachers</h2></div>
+        <div class="card">
+          <h3>Add New Teacher</h3>
+          <form id="teacherForm">
+            <div class="form-row">
+              <div class="field"><label>Full Name</label><input type="text" id="t_name" required></div>
+              <div class="field"><label>Phone</label><input type="text" id="t_phone"></div>
+              <div class="field"><label>Email</label><input type="email" id="t_email"></div>
+              <div class="field"><label>Qualification</label><input type="text" id="t_qual"></div>
+              <div class="field"><label>Address</label><input type="text" id="t_address"></div>
+              <div class="submit-col"><button type="submit" class="btn">Add Teacher</button></div>
+            </div>
+          </form>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Qualification</th><th>Action</th></tr></thead>
+          <tbody id="teachersTable"></tbody>
+        </table>
+      </section>
+
+      <!-- CLASSES -->
+      <section id="page-classes" class="page">
+        <div class="page-head"><div class="eyebrow">Records</div><h2>Classes</h2></div>
+        <div class="card">
+          <h3>Add New Class</h3>
+          <form id="classForm">
+            <div class="form-row">
+              <div class="field"><label>Class Name</label><input type="text" id="c_name" placeholder="e.g. Grade 4" required></div>
+              <div class="field"><label>Class Teacher</label><select id="c_teacher"></select></div>
+              <div class="submit-col"><button type="submit" class="btn">Add Class</button></div>
+            </div>
+          </form>
+        </div>
+        <table>
+          <thead><tr><th>Class Name</th><th>Class Teacher</th><th>Action</th></tr></thead>
+          <tbody id="classesTable"></tbody>
+        </table>
+      </section>
+
+      <!-- SUBJECTS -->
+      <section id="page-subjects" class="page">
+        <div class="page-head"><div class="eyebrow">Records</div><h2>Subjects</h2></div>
+        <div class="card">
+          <h3>Add New Subject</h3>
+          <form id="subjectForm">
+            <div class="form-row">
+              <div class="field"><label>Subject Name</label><input type="text" id="sub_name" required></div>
+              <div class="field"><label>Class</label><select id="sub_class"></select></div>
+              <div class="field"><label>Teacher</label><select id="sub_teacher"></select></div>
+              <div class="submit-col"><button type="submit" class="btn">Add Subject</button></div>
+            </div>
+          </form>
+        </div>
+        <table>
+          <thead><tr><th>Subject</th><th>Class</th><th>Teacher</th><th>Action</th></tr></thead>
+          <tbody id="subjectsTable"></tbody>
+        </table>
+      </section>
+
+      <!-- ATTENDANCE -->
+      <section id="page-attendance" class="page">
+        <div class="page-head"><div class="eyebrow">Records</div><h2>Attendance</h2></div>
+        <div class="card">
+          <h3>Record Attendance</h3>
+          <form id="attendanceForm">
+            <div class="form-row">
+              <div class="field"><label>Student</label><select id="a_student" required></select></div>
+              <div class="field"><label>Class</label><select id="a_class"></select></div>
+              <div class="field small"><label>Date</label><input type="date" id="a_date" required></div>
+              <div class="field small"><label>Status</label>
+                <select id="a_status" required><option>Present</option><option>Absent</option><option>Late</option></select>
+              </div>
+              <div class="submit-col"><button type="submit" class="btn">Save</button></div>
+            </div>
+          </form>
+        </div>
+        <table>
+          <thead><tr><th>Student</th><th>Class</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="attendanceTable"></tbody>
+        </table>
+      </section>
+
+      <!-- RESULTS -->
+      <section id="page-results" class="page">
+        <div class="page-head"><div class="eyebrow">Records</div><h2>Results</h2></div>
+        <div class="card">
+          <h3>Enter Result</h3>
+          <form id="resultForm">
+            <div class="form-row">
+              <div class="field"><label>Student</label><select id="r_student" required></select></div>
+              <div class="field"><label>Subject</label><select id="r_subject" required></select></div>
+              <div class="field small"><label>Term</label><input type="text" id="r_term" placeholder="Term 1"></div>
+              <div class="field small"><label>Year</label><input type="number" id="r_year" placeholder="2026"></div>
+              <div class="field small"><label>Score</label><input type="number" step="0.01" id="r_score"></div>
+              <div class="field small"><label>Grade</label><input type="text" id="r_grade"></div>
+              <div class="submit-col"><button type="submit" class="btn">Save</button></div>
+            </div>
+          </form>
+        </div>
+        <table>
+          <thead><tr><th>Student</th><th>Subject</th><th>Term</th><th>Year</th><th>Score</th><th>Grade</th><th>Action</th></tr></thead>
+          <tbody id="resultsTable"></tbody>
+        </table>
+      </section>
+
+      <!-- FEES -->
+      <section id="page-fees" class="page">
+        <div class="page-head"><div class="eyebrow">Records</div><h2>Fees</h2></div>
+        <div class="card">
+          <h3>Bill a Fee</h3>
+          <form id="feeForm">
+            <div class="form-row">
+              <div class="field"><label>Student</label><select id="f_student" required></select></div>
+              <div class="field small"><label>Amount</label><input type="number" step="0.01" id="f_amount" required></div>
+              <div class="field small"><label>Term</label><input type="text" id="f_term"></div>
+              <div class="field small"><label>Year</label><input type="number" id="f_year"></div>
+              <div class="submit-col"><button type="submit" class="btn">Add Fee</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="card">
+          <h3>Record a Payment</h3>
+          <form id="paymentForm">
+            <div class="form-row">
+              <div class="field"><label>Fee Bill</label><select id="p_fee" required></select></div>
+              <div class="field small"><label>Amount Paid</label><input type="number" step="0.01" id="p_amount" required></div>
+              <div class="field small"><label>Date</label><input type="date" id="p_date" required></div>
+              <div class="field"><label>Receipt No</label><input type="text" id="p_receipt"></div>
+              <div class="submit-col"><button type="submit" class="btn">Save Payment</button></div>
+            </div>
+          </form>
+        </div>
+        <table>
+          <thead><tr><th>Student</th><th>Term</th><th>Year</th><th>Billed</th><th>Paid</th><th>Balance</th></tr></thead>
+          <tbody id="feesTable"></tbody>
+        </table>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   IN-MEMORY DATA STORE
+   (No backend — everything lives in JS variables for
+   this session. Refreshing the page resets the data.)
+===================================================== */
+let nextId = { students:1, teachers:1, classes:1, subjects:1, attendance:1, results:1, fees:1, payments:1 };
+
+let teachers = [];
+let classes = [];
+let subjects = [];
+let students = [];
+let attendance = [];
+let results = [];
+let fees = [];
+let payments = [];
+
+function seedData(){
+  const t1 = { id: nextId.teachers++, full_name:"Grace Mwangi", phone:"0722-000111", email:"grace@manda.school", qualification:"B.Ed", address:"Manda Town" };
+  const t2 = { id: nextId.teachers++, full_name:"Samuel Otieno", phone:"0733-000222", email:"samuel@manda.school", qualification:"Dip. Education", address:"Manda Town" };
+  teachers.push(t1, t2);
+
+  const c1 = { id: nextId.classes++, class_name:"Grade 4", teacher_id:t1.id };
+  const c2 = { id: nextId.classes++, class_name:"Grade 5", teacher_id:t2.id };
+  classes.push(c1, c2);
+
+  subjects.push(
+    { id: nextId.subjects++, subject_name:"Mathematics", class_id:c1.id, teacher_id:t1.id },
+    { id: nextId.subjects++, subject_name:"English", class_id:c2.id, teacher_id:t2.id }
+  );
+
+  const s1 = { id: nextId.students++, admission_no:"MPS-0001", first_name:"Amina", last_name:"Hassan", gender:"Female", dob:"2016-03-12", class_id:c1.id, parent_name:"Fatuma Hassan", parent_phone:"0700-111222", address:"Manda Estate" };
+  const s2 = { id: nextId.students++, admission_no:"MPS-0002", first_name:"Brian", last_name:"Kiptoo", gender:"Male", dob:"2015-11-02", class_id:c2.id, parent_name:"John Kiptoo", parent_phone:"0700-333444", address:"Manda Estate" };
+  students.push(s1, s2);
+
+  fees.push({ id: nextId.fees++, student_id:s1.id, amount:4500, term:"Term 1", year:2026 });
+  payments.push({ id: nextId.payments++, fee_id:fees[0].id, amount_paid:2000, payment_date:"2026-01-20", receipt_no:"RCT-1001" });
+}
+seedData();
+
+/* =====================================================
+   LOGIN
+===================================================== */
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const errBox = document.getElementById('loginError');
+  if(u === 'admin' && p === 'admin123'){
+    errBox.style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderAll();
+  } else {
+    errBox.textContent = 'Invalid username or password.';
+    errBox.style.display = 'block';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function(){
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginPass').value = '';
+});
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-'+btn.dataset.page).classList.add('active');
+  });
+});
+
+/* =====================================================
+   HELPERS
+===================================================== */
+function esc(str){
+  if(str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function fillSelect(el, list, valueKey, textFn, placeholder){
+  const current = el.value;
+  el.innerHTML = (placeholder ? `<option value="">${placeholder}</option>` : '') +
+    list.map(item => `<option value="${item[valueKey]}">${esc(textFn(item))}</option>`).join('');
+  if([...el.options].some(o=>o.value === current)) el.value = current;
+}
+function teacherName(id){ const t = teachers.find(t=>t.id===id); return t ? t.full_name : '-'; }
+function className(id){ const c = classes.find(c=>c.id===id); return c ? c.class_name : '-'; }
+function studentName(id){ const s = students.find(s=>s.id===id); return s ? (s.first_name+' '+s.last_name) : '-'; }
+function subjectName(id){ const s = subjects.find(s=>s.id===id); return s ? s.subject_name : '-'; }
+
+/* =====================================================
+   RENDER: DASHBOARD
+===================================================== */
+function renderDashboard(){
+  document.getElementById('statStudents').textContent = students.length;
+  document.getElementById('statTeachers').textContent = teachers.length;
+  document.getElementById('statClasses').textContent = classes.length;
+  const totalFees = fees.reduce((sum,f)=>sum+Number(f.amount),0);
+  document.getElementById('statFees').textContent = totalFees.toLocaleString(undefined,{minimumFractionDigits:2});
+}
+
+/* =====================================================
+   STUDENTS
+===================================================== */
+document.getElementById('studentForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  students.push({
+    id: nextId.students++,
+    admission_no: document.getElementById('s_admission').value.trim(),
+    first_name: document.getElementById('s_first').value.trim(),
+    last_name: document.getElementById('s_last').value.trim(),
+    gender: document.getElementById('s_gender').value,
+    dob: document.getElementById('s_dob').value,
+    class_id: Number(document.getElementById('s_class').value) || null,
+    parent_name: document.getElementById('s_parent').value.trim(),
+    parent_phone: document.getElementById('s_phone').value.trim(),
+    address: document.getElementById('s_address').value.trim()
+  });
+  this.reset();
+  renderAll();
+});
+function deleteStudent(id){
+  if(!confirm('Delete this student?')) return;
+  students = students.filter(s=>s.id!==id);
+  attendance = attendance.filter(a=>a.student_id!==id);
+  results = results.filter(r=>r.student_id!==id);
+  const feeIds = fees.filter(f=>f.student_id===id).map(f=>f.id);
+  fees = fees.filter(f=>f.student_id!==id);
+  payments = payments.filter(p=>!feeIds.includes(p.fee_id));
+  renderAll();
+}
+function renderStudents(){
+  const tbody = document.getElementById('studentsTable');
+  if(students.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No students yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = students.map(s=>`
+      <tr>
+        <td class="mono">${esc(s.admission_no)}</td>
+        <td>${esc(s.first_name)} ${esc(s.last_name)}</td>
+        <td>${esc(s.gender)}</td>
+        <td>${esc(className(s.class_id))}</td>
+        <td>${esc(s.parent_name)}</td>
+        <td>${esc(s.parent_phone)}</td>
+        <td><button class="btn red small" onclick="deleteStudent(${s.id})">Delete</button></td>
+      </tr>`).join('');
+  }
+  fillSelect(document.getElementById('s_class'), classes, 'id', c=>c.class_name, '-- Class --');
+}
+
+/* =====================================================
+   TEACHERS
+===================================================== */
+document.getElementById('teacherForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  teachers.push({
+    id: nextId.teachers++,
+    full_name: document.getElementById('t_name').value.trim(),
+    phone: document.getElementById('t_phone').value.trim(),
+    email: document.getElementById('t_email').value.trim(),
+    qualification: document.getElementById('t_qual').value.trim(),
+    address: document.getElementById('t_address').value.trim()
+  });
+  this.reset();
+  renderAll();
+});
+function deleteTeacher(id){
+  if(!confirm('Delete this teacher?')) return;
+  teachers = teachers.filter(t=>t.id!==id);
+  classes.forEach(c=>{ if(c.teacher_id===id) c.teacher_id=null; });
+  subjects.forEach(s=>{ if(s.teacher_id===id) s.teacher_id=null; });
+  renderAll();
+}
+function renderTeachers(){
+  const tbody = document.getElementById('teachersTable');
+  if(teachers.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">No teachers yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = teachers.map(t=>`
+      <tr>
+        <td>${esc(t.full_name)}</td>
+        <td>${esc(t.phone)}</td>
+        <td>${esc(t.email)}</td>
+        <td>${esc(t.qualification)}</td>
+        <td><button class="btn red small" onclick="deleteTeacher(${t.id})">Delete</button></td>
+      </tr>`).join('');
+  }
+  fillSelect(document.getElementById('c_teacher'), teachers, 'id', t=>t.full_name, '-- Assign Teacher --');
+  fillSelect(document.getElementById('sub_teacher'), teachers, 'id', t=>t.full_name, '-- Teacher --');
+}
+
+/* =====================================================
+   CLASSES
+===================================================== */
+document.getElementById('classForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  classes.push({
+    id: nextId.classes++,
+    class_name: document.getElementById('c_name').value.trim(),
+    teacher_id: Number(document.getElementById('c_teacher').value) || null
+  });
+  this.reset();
+  renderAll();
+});
+function deleteClass(id){
+  if(!confirm('Delete this class?')) return;
+  classes = classes.filter(c=>c.id!==id);
+  students.forEach(s=>{ if(s.class_id===id) s.class_id=null; });
+  subjects.forEach(s=>{ if(s.class_id===id) s.class_id=null; });
+  attendance.forEach(a=>{ if(a.class_id===id) a.class_id=null; });
+  renderAll();
+}
+function renderClasses(){
+  const tbody = document.getElementById('classesTable');
+  if(classes.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="3">No classes yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = classes.map(c=>`
+      <tr>
+        <td>${esc(c.class_name)}</td>
+        <td>${esc(teacherName(c.teacher_id))}</td>
+        <td><button class="btn red small" onclick="deleteClass(${c.id})">Delete</button></td>
+      </tr>`).join('');
+  }
+  fillSelect(document.getElementById('sub_class'), classes, 'id', c=>c.class_name, '-- Class --');
+  fillSelect(document.getElementById('a_class'), classes, 'id', c=>c.class_name, '-- Class --');
+}
+
+/* =====================================================
+   SUBJECTS
+===================================================== */
+document.getElementById('subjectForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  subjects.push({
+    id: nextId.subjects++,
+    subject_name: document.getElementById('sub_name').value.trim(),
+    class_id: Number(document.getElementById('sub_class').value) || null,
+    teacher_id: Number(document.getElementById('sub_teacher').value) || null
+  });
+  this.reset();
+  renderAll();
+});
+function deleteSubject(id){
+  if(!confirm('Delete this subject?')) return;
+  subjects = subjects.filter(s=>s.id!==id);
+  results = results.filter(r=>r.subject_id!==id);
+  renderAll();
+}
+function renderSubjects(){
+  const tbody = document.getElementById('subjectsTable');
+  if(subjects.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="4">No subjects yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = subjects.map(s=>`
+      <tr>
+        <td>${esc(s.subject_name)}</td>
+        <td>${esc(className(s.class_id))}</td>
+        <td>${esc(teacherName(s.teacher_id))}</td>
+        <td><button class="btn red small" onclick="deleteSubject(${s.id})">Delete</button></td>
+      </tr>`).join('');
+  }
+  fillSelect(document.getElementById('r_subject'), subjects, 'id', s=>s.subject_name, '-- Subject --');
+}
+
+/* =====================================================
+   ATTENDANCE
+===================================================== */
+document.getElementById('attendanceForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  attendance.push({
+    id: nextId.attendance++,
+    student_id: Number(document.getElementById('a_student').value),
+    class_id: Number(document.getElementById('a_class').value) || null,
+    date: document.getElementById('a_date').value,
+    status: document.getElementById('a_status').value
+  });
+  this.reset();
+  renderAll();
+});
+function deleteAttendance(id){
+  attendance = attendance.filter(a=>a.id!==id);
+  renderAttendance();
+}
+function renderAttendance(){
+  const tbody = document.getElementById('attendanceTable');
+  const rows = [...attendance].sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+  if(rows.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="5">No attendance recorded yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = rows.map(a=>`
+      <tr>
+        <td>${esc(studentName(a.student_id))}</td>
+        <td>${esc(className(a.class_id))}</td>
+        <td>${esc(a.date)}</td>
+        <td>${esc(a.status)}</td>
+        <td><button class="btn red small" onclick="deleteAttendance(${a.id})">Delete</button></td>
+      </tr>`).join('');
+  }
+  fillSelect(document.getElementById('a_student'), students, 'id', s=>s.first_name+' '+s.last_name, '-- Student --');
+}
+
+/* =====================================================
+   RESULTS
+===================================================== */
+document.getElementById('resultForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  results.push({
+    id: nextId.results++,
+    student_id: Number(document.getElementById('r_student').value),
+    subject_id: Number(document.getElementById('r_subject').value),
+    term: document.getElementById('r_term').value.trim(),
+    year: document.getElementById('r_year').value,
+    score: document.getElementById('r_score').value,
+    grade: document.getElementById('r_grade').value.trim()
+  });
+  this.reset();
+  renderAll();
+});
+function deleteResult(id){
+  results = results.filter(r=>r.id!==id);
+  renderResults();
+}
+function renderResults(){
+  const tbody = document.getElementById('resultsTable');
+  if(results.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No results entered yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = [...results].reverse().map(r=>`
+      <tr>
+        <td>${esc(studentName(r.student_id))}</td>
+        <td>${esc(subjectName(r.subject_id))}</td>
+        <td>${esc(r.term)}</td>
+        <td>${esc(r.year)}</td>
+        <td>${esc(r.score)}</td>
+        <td>${esc(r.grade)}</td>
+        <td><button class="btn red small" onclick="deleteResult(${r.id})">Delete</button></td>
+      </tr>`).join('');
+  }
+  fillSelect(document.getElementById('r_student'), students, 'id', s=>s.first_name+' '+s.last_name, '-- Student --');
+}
+
+/* =====================================================
+   FEES & PAYMENTS
+===================================================== */
+document.getElementById('feeForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  fees.push({
+    id: nextId.fees++,
+    student_id: Number(document.getElementById('f_student').value),
+    amount: Number(document.getElementById('f_amount').value),
+    term: document.getElementById('f_term').value.trim(),
+    year: document.getElementById('f_year').value
+  });
+  this.reset();
+  renderAll();
+});
+document.getElementById('paymentForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  payments.push({
+    id: nextId.payments++,
+    fee_id: Number(document.getElementById('p_fee').value),
+    amount_paid: Number(document.getElementById('p_amount').value),
+    payment_date: document.getElementById('p_date').value,
+    receipt_no: document.getElementById('p_receipt').value.trim()
+  });
+  this.reset();
+  renderAll();
+});
+function paidForFee(feeId){
+  return payments.filter(p=>p.fee_id===feeId).reduce((sum,p)=>sum+Number(p.amount_paid),0);
+}
+function renderFees(){
+  const tbody = document.getElementById('feesTable');
+  if(fees.length===0){ tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No fee bills yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = [...fees].reverse().map(f=>{
+      const paid = paidForFee(f.id);
+      const balance = Number(f.amount) - paid;
+      return `
+      <tr>
+        <td>${esc(studentName(f.student_id))}</td>
+        <td>${esc(f.term)}</td>
+        <td>${esc(f.year)}</td>
+        <td>${Number(f.amount).toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+        <td>${paid.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+        <td class="${balance>0 ? 'balance-pos':'balance-zero'}">${balance.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+      </tr>`;
+    }).join('');
+  }
+  fillSelect(document.getElementById('f_student'), students, 'id', s=>s.first_name+' '+s.last_name, '-- Student --');
+  fillSelect(document.getElementById('p_fee'), fees, 'id', f=>`Fee #${f.id} — ${studentName(f.student_id)} (${f.amount})`, '-- Select Fee Bill --');
+}
+
+/* =====================================================
+   RENDER ALL
+===================================================== */
+function renderAll(){
+  renderDashboard();
+  renderStudents();
+  renderTeachers();
+  renderClasses();
+  renderSubjects();
+  renderAttendance();
+  renderResults();
+  renderFees();
+}
+</script>
+</body>
+</html>
